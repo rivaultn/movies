@@ -1,20 +1,22 @@
 <template>
-  <b-row align-h="center">
-    <b-row align-h="center">
-      <b-col cols="10">
-        <h2 class="title-page">Au cinéma</h2>
-        <b-row v-for="i in Math.ceil(movies.results.length / 5)" :key="i" class="filmRow">
-          <b-col v-for="movie in movies.results.slice((i - 1) * 5, i * 5)" :key="movie.id">
-            <b-img v-if="movie.poster_path != null" thumbnail fluid v-bind:src="'https://image.tmdb.org/t/p/w300/'+ movie.poster_path" alt="Thumbnail" />
-            <b-img v-else thumbnail fluid v-bind:src="'/assets/No_image_Available'" alt="Thumbnail" />
-          </b-col>
-        </b-row>
+  <b-container>
+      <b-col>
+        <h2 class="title-page">EN SALLE</h2>
+
+        <b-card-group deck v-for="i in Math.ceil(movies.results.length / 5)" :key="i" class="filmRow">
+          <b-card class="cardMovie" v-for="movie in movies.results.slice((i - 1) * 5, i * 5)" :key="movie.id" bg-variant="dark"
+                    :title="movie.title"
+                    :img-src="movie.poster_path ? 'https://image.tmdb.org/t/p/w300/'+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
+                    img-alt="Img"
+                    img-top>
+          </b-card>
+
+        </b-card-group>
       </b-col>
-      </b-row>
-    <b-row>
-      <b-pagination-nav :link-gen="change" :number-of-pages="movies.total_pages" v-model="currentPage" />
+    <b-row class="justify-content-md-center paginationRow">
+      <b-pagination-nav :link-gen="change" :number-of-pages="movies.total_pages" v-model="currentPage" class="bg-dark componentFont"/>
     </b-row>
-  </b-row>
+  </b-container>
 </template>
 
 <script>
@@ -61,11 +63,18 @@ export default {
 
 <style>
 .title-page {
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   margin-top: 20px;
   color: #707984;
+  font-weight: bold;
 }
 .filmRow{
   margin-bottom: 20px;
+}
+.cardMovie{
+  color: #707984;
+}
+.paginationRow{
+  margin-top: 30px;
 }
 </style>

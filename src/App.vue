@@ -7,18 +7,18 @@
 
       <b-collapse is-nav id="nav_collapse">
 
-        <b-navbar-nav>
-          <b-nav-item href="#/myMovies">Mes films</b-nav-item>
-          <b-nav-item href="#/mySeries">Mes séries</b-nav-item>
-          <b-nav-item href="#/latestMovies">Films</b-nav-item>
-          <b-nav-item href="#/series">Séries</b-nav-item>
+        <b-navbar-nav class="componentFont">
+          <b-nav-item href="#/myMovies">MES FILMS</b-nav-item>
+          <b-nav-item href="#/mySeries">MES SÉRIES</b-nav-item>
+          <b-nav-item href="#/latestMovies">FILMS</b-nav-item>
+          <b-nav-item href="#/series"><b>SÉRIES</b></b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-form>
-            <b-form-input size="sm" class="mr-sm-2" type="text" placeholder="Recherche"/>
-            <b-button size="sm" class="my-2 my-sm-0" type="submit">Rechercher</b-button>
+            <b-form-input size="sm" class="mr-sm-2 componentFont" type="text" placeholder="recherche"/>
+            <b-button size="sm" class="my-2 my-sm-0 componentFont" type="submit">Rechercher</b-button>
           </b-nav-form>
         </b-navbar-nav>
 
@@ -36,7 +36,7 @@ export default {
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Dense', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -47,4 +47,16 @@ body {
   background-color: #2B3239 !important;
 }
 
+@font-face {
+  font-family: Dense;
+  src: url(/static/fonts/Dense-Regular.otf);
+}
+
+.navbar{
+  font-weight: bold;
+}
+
+.componentFont{
+  font-size: 22px;
+}
 </style>
