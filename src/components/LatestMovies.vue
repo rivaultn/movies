@@ -6,7 +6,7 @@
         <b-card-group deck v-for="i in Math.ceil(movies.results.length / 5)" :key="i" class="filmRow">
           <b-card class="cardMovie" v-for="movie in movies.results.slice((i - 1) * 5, i * 5)" :key="movie.id" bg-variant="dark"
                     :title="movie.title"
-                    :img-src="movie.poster_path ? 'https://image.tmdb.org/t/p/w300/'+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
+                    :img-src="movie.poster_path ? path_img_movie_300+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
                     img-alt="Img"
                     img-top>
             <div slot="footer">
@@ -22,17 +22,47 @@
     </b-row>
 
     <b-modal id="detailsModal"
-             title="Modal Variants"
+             :title= "movie.title"
              header-bg-variant="dark"
              header-text-variant="light"
-             :hide-footer=true>
+             footer-bg-variant="dark"
+             footer-text-variant="light"
+             :hide-footer=false
+              size="lg">
 
+      <b-container fluid class="modal-text">
+        <b-row>
+          <b-col cols="4">
+            <b-img fluid :src="movie.poster_path ? path_img_movie_200+movie.poster_path  : require('../assets/No_Image_Available.jpg')" alt="left image" />
+          </b-col>
+          <b-col>
+          <h4>Synopsis : </h4>
+            <span>{{ movie.overview }}</span>
+          </b-col>
+        </b-row>
+        <b-row class="mainCharacters">
+          <b-card-group deck>
+            <b-card mx-auto class="cardCharacter" v-for="indexCharacter in 5" :key="indexCharacter" v-if="mainCharacters.length != 0"
+                    :title="mainCharacters[indexCharacter].name "
+                    :img-src="mainCharacters[indexCharacter].profile_path ? path_img_face_138_175+mainCharacters[indexCharacter].profile_path  : require('../assets/No_Image_Available.jpg')"
+                    img-alt="Img">
+              <p class="card-text">
+                <span >{{mainCharacters[indexCharacter].character}}</span>
+              </p>
+            </b-card>
+          </b-card-group>
+        </b-row>
+      </b-container>
+      <div slot="modal-footer" class="w-100">
+        <b-link href="url"><icon class="saved" name="eye" scale="2"></icon></b-link>
+      </div>
     </b-modal>
   </b-container>
 </template>
 
 <script>
 import axios from 'axios'
+import {URL_API, API_KEY, PATH_IMG_MOVIE_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_MOVIE_200} from '../constant.js'
 
 export default {
   name: 'MovieList',
@@ -40,11 +70,16 @@ export default {
     return {
       currentPage: 1,
       movies: [],
-      errors: []
+      errors: [],
+      movie: {},
+      path_img_movie_300: PATH_IMG_MOVIE_300,
+      path_img_movie_200: PATH_IMG_MOVIE_200,
+      path_img_face_138_175: PATH_IMG_FACE_138_175,
+      mainCharacters: []
     }
   },
   created () {
-    axios.get('https://api.themoviedb.org/3/movie/now_playing?api_key=ae3e5728d96161eec2f5d86350cd1cdb&language=fr-FR&page='.concat(this.currentPage))
+    axios.get(URL_API + 'now_playing?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
       .then(response => {
         this.movies = response.data
       })
@@ -54,16 +89,24 @@ export default {
   },
   methods: {
     details (movie) {
-      axios.get('https://api.themoviedb.org/3/movie/'.concat(movie.id).concat('?api_key=ae3e5728d96161eec2f5d86350cd1cdb&language=fr-FR'))
+      this.mainCharacters = []
+      axios.get(URL_API + movie.id + '?api_key=' + API_KEY + '&language=' + LNG)
         .then(response => {
-          this.movies = response.data
+          this.movie = response.data
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
+      axios.get(URL_API + movie.id + '/credits?api_key=' + API_KEY)
+        .then(response => {
+          this.mainCharacters = response.data.cast
         })
         .catch(e => {
           this.errors.push(e)
         })
     },
     change () {
-      axios.get('https://api.themoviedb.org/3/movie/now_playing?api_key=ae3e5728d96161eec2f5d86350cd1cdb&language=fr-FR&page='.concat(this.currentPage))
+      axios.get(URL_API + 'now_playing?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
         .then(response => {
           this.movies = response.data
         })
@@ -77,31 +120,52 @@ export default {
 </script>
 
 <style>
-.title-page {
-  margin-bottom: 30px;
-  margin-top: 20px;
-  color: #707984;
-  font-weight: bold;
-}
-.filmRow{
-  margin-bottom: 20px;
-}
-.cardMovie{
-  color: #707984;
-}
-.paginationRow{
-  margin-top: 30px;
-}
-.saved{
-  color: #2D63A1;
-}
-.details{
-  font-size: 22px;
-  color: inherit;
-  text-decoration: inherit;
-}
-.details:hover{
-  color: inherit;
-  text-decoration: inherit;
-}
+  .title-page {
+    margin-bottom: 30px;
+    margin-top: 20px;
+    color: #707984;
+    font-weight: bold;
+  }
+  .filmRow{
+    margin-bottom: 20px;
+  }
+  .cardMovie{
+    color: #707984;
+  }
+  .card-body > h4{
+    font-weight: bold;
+  }
+  .paginationRow{
+    margin-top: 30px;
+  }
+  .saved{
+    color: #2D63A1;
+  }
+  .details{
+    font-size: 22px;
+    color: inherit;
+    text-decoration: inherit;
+  }
+  .details:hover{
+    color: inherit;
+    text-decoration: inherit;
+  }
+  .modal-title{
+    font-size: 32px;
+    padding-left: 20px;
+  }
+  .modal-text{
+    font-size: 22px;
+    padding-top: 20px;
+    text-align: initial;
+  }
+  .modal-text > h4{
+    font-weight: bold;
+    font-size: 30px;
+  }
+  .mainCharacters{
+    margin-top: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 </style>
