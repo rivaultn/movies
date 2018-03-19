@@ -35,8 +35,9 @@
             <b-img fluid :src="serie.poster_path ? path_img_movie_300+serie.poster_path  : require('../assets/No_Image_Available.jpg')" alt="left image" />
           </b-col>
           <b-col>
-            <h4>Synopsis : </h4>
-            <span>{{ serie.overview }}</span>
+            <h4 class="synopsis">Synopsis : </h4>
+            <span>{{ serie.overview }}</span><br /><br />
+            <b-link class="genreLink" v-for="genre in serie.genres" :key="genre.id"> {{genre.name}} </b-link>
           </b-col>
         </b-row>
         <b-row class="mainCharacters">
@@ -154,12 +155,12 @@ export default {
   .saved{
     color: #2D63A1;
   }
-  .details{
+  .details, .genreLink{
     font-size: 22px;
     color: inherit;
     text-decoration: inherit;
   }
-  .details:hover{
+  .details:hover, .genreLink:hover{
     color: inherit;
     text-decoration: inherit;
   }
@@ -172,9 +173,9 @@ export default {
     padding-top: 20px;
     text-align: initial;
   }
-  .modal-text > h4{
+  .synopsis{
     font-weight: bold;
-    font-size: 30px;
+    font-size: 28px;
   }
   .mainCharacters{
     margin-top: 40px;

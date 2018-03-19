@@ -36,8 +36,9 @@
             <b-img fluid :src="movie.poster_path ? path_img_movie_200+movie.poster_path  : require('../assets/No_Image_Available.jpg')" alt="left image" />
           </b-col>
           <b-col>
-          <h4>Synopsis : </h4>
-            <span>{{ movie.overview }}</span>
+          <h4 class="synopsis">Synopsis : </h4>
+            <span>{{ movie.overview }}</span><br /><br />
+            <b-link class="genreLink" v-for="genre in movie.genres" :key="genre.id"> {{genre.name}} </b-link>
           </b-col>
         </b-row>
         <b-row class="mainCharacters">
@@ -47,7 +48,7 @@
                     :img-src="mainCharacters[indexCharacter].profile_path ? path_img_face_138_175+mainCharacters[indexCharacter].profile_path  : require('../assets/No_Image_Available.jpg')"
                     img-alt="Img">
               <p class="card-text">
-                <span >{{mainCharacters[indexCharacter].character}}</span>
+                <span>{{mainCharacters[indexCharacter].character}}</span>
               </p>
             </b-card>
           </b-card-group>
@@ -67,7 +68,7 @@
           <b-form-input id="input-tag" type="text" placeholder="Tags"></b-form-input>
         </b-col>
         <b-col sm="2">
-          <b-button submit href="#">OK</b-button>
+          <b-button type="submit" href="#">OK</b-button>
         </b-col>
       </b-row>
     </b-modal>
@@ -155,14 +156,18 @@ export default {
   .saved{
     color: #2D63A1;
   }
-  .details{
+  .details, .genreLink{
     font-size: 22px;
     color: inherit;
     text-decoration: inherit;
   }
-  .details:hover{
+  .details:hover, .genreLink:hover{
     color: inherit;
     text-decoration: inherit;
+  }
+  .genreLink{
+    font-weight: bold;
+    margin-right: 10px;
   }
   .modal-title{
     font-size: 32px;
@@ -173,9 +178,9 @@ export default {
     padding-top: 20px;
     text-align: initial;
   }
-  .modal-text > h4{
+  .synopsis{
     font-weight: bold;
-    font-size: 30px;
+    font-size: 28px;
   }
   .mainCharacters{
     margin-top: 40px;
