@@ -11,7 +11,7 @@
                     img-top>
             <div slot="footer">
               <b-link @click.stop="details(movie)" v-b-modal.detailsModal class="details">détails</b-link><br />
-              <b-link href="url"><icon class="saved" name="eye" scale="2"></icon></b-link>
+              <b-link v-b-modal.tagModal><icon class="saved" name="eye" scale="2"></icon></b-link>
             </div>
           </b-card>
 
@@ -54,15 +54,29 @@
         </b-row>
       </b-container>
       <div slot="modal-footer" class="w-100">
-        <b-link href="url"><icon class="saved" name="eye" scale="2"></icon></b-link>
+        <b-link v-b-modal.tagModal><icon class="saved" name="eye" scale="2"></icon></b-link>
       </div>
+    </b-modal>
+
+    <b-modal id="tagModal"
+             :hide-header=true
+             :hide-footer=true>
+      <b-row class="my-1">
+        <b-col sm="2"><label for="input-tag">Tags:</label></b-col>
+        <b-col sm="8">
+          <b-form-input id="input-tag" type="text" placeholder="Tags"></b-form-input>
+        </b-col>
+        <b-col sm="2">
+          <b-button submit href="#">OK</b-button>
+        </b-col>
+      </b-row>
     </b-modal>
   </b-container>
 </template>
 
 <script>
 import axios from 'axios'
-import {URL_API, API_KEY, PATH_IMG_MOVIE_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_MOVIE_200} from '../constant.js'
+import {URL_API_MOVIE, API_KEY, PATH_IMG_MOVIE_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_MOVIE_200} from '../constant.js'
 
 export default {
   name: 'MovieList',
@@ -79,7 +93,7 @@ export default {
     }
   },
   created () {
-    axios.get(URL_API + 'now_playing?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
+    axios.get(URL_API_MOVIE + 'now_playing?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
       .then(response => {
         this.movies = response.data
       })
@@ -90,14 +104,14 @@ export default {
   methods: {
     details (movie) {
       this.mainCharacters = []
-      axios.get(URL_API + movie.id + '?api_key=' + API_KEY + '&language=' + LNG)
+      axios.get(URL_API_MOVIE + movie.id + '?api_key=' + API_KEY + '&language=' + LNG)
         .then(response => {
           this.movie = response.data
         })
         .catch(e => {
           this.errors.push(e)
         })
-      axios.get(URL_API + movie.id + '/credits?api_key=' + API_KEY)
+      axios.get(URL_API_MOVIE + movie.id + '/credits?api_key=' + API_KEY)
         .then(response => {
           this.mainCharacters = response.data.cast
         })
@@ -106,7 +120,7 @@ export default {
         })
     },
     change () {
-      axios.get(URL_API + 'now_playing?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
+      axios.get(URL_API_MOVIE + 'now_playing?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
         .then(response => {
           this.movies = response.data
         })
@@ -167,5 +181,8 @@ export default {
     margin-top: 40px;
     padding-left: 10px;
     padding-right: 10px;
+  }
+  #tagModal{
+    font-size: 22px;
   }
 </style>

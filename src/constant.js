@@ -1,4 +1,5 @@
-export const URL_API = 'https://api.themoviedb.org/3/movie/'
+export const URL_API_MOVIE = 'https://api.themoviedb.org/3/movie/'
+export const URL_API_SERIE = 'https://api.themoviedb.org/3/tv/'
 export const API_KEY = 'ae3e5728d96161eec2f5d86350cd1cdb'
 export const PATH_IMG_MOVIE_300 = 'https://image.tmdb.org/t/p/w300/'
 export const PATH_IMG_MOVIE_200 = 'https://image.tmdb.org/t/p/w200/'
