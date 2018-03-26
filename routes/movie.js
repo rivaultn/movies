@@ -40,6 +40,16 @@ router.post('/movie', function (req, res, next) {
   })
 })
 
+router.put('/movie', function (req, res, next) {
+  var query = {'id': req.body.id}
+  console.log(req.body)
+  console.log(req.body.id)
+  Movie.findOneAndUpdate(query, req.body, {upsert: true}, function (err, doc) {
+    if (err) return res.send(500, { error: err })
+    return res.send('succesfully saved')
+  })
+})
+
 router.delete('/movie/:id', function (req, res, next) {
   Movie.deleteOne({
     id: req.params.id

@@ -16,7 +16,7 @@
                     img-top>
             <div slot="footer">
               <b-link @click.stop="details(movie)" v-b-modal.detailsModal class="details">détails</b-link><br />
-              <b-link v-b-modal.tagModal @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
+              <b-link @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
             </div>
           </b-card>
 
@@ -60,24 +60,25 @@
         </b-row>
       </b-container>
       <div slot="modal-footer" class="w-100">
-        <b-link v-b-modal.tagModal @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
+        <b-link @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
       </div>
     </b-modal>
 
     <b-modal id="tagModal"
              :hide-header=true
-             :hide-footer=true>
+             :hide-footer=true
+             ref="tagModal">
       <b-form @submit="onModalSubmit">
         <b-row class="my-1">
           <b-col sm="3"><label for="input-comment">Commentaires :</label></b-col>
           <b-col sm="9">
-            <b-form-input id="input-comment" type="text" placeholder="Commentaires" v-model="movieToSave.comment"></b-form-input>
+            <b-form-input ref="inputComment" id="input-comment" type="text" placeholder="Commentaires" v-model="comment"></b-form-input>
           </b-col>
         </b-row>
         <b-row class="my-1">
           <b-col sm="3"><label for="input-tag">Tags :</label></b-col>
           <b-col sm="7">
-            <b-form-input id="input-tag" type="text" placeholder="Tags" v-model="tags"></b-form-input>
+            <b-form-input ref="inputTag" id="input-tag" type="text" placeholder="Tags" v-model="tags"></b-form-input>
           </b-col>
           <b-col sm="2">
             <b-button type="submit">OK</b-button>
@@ -97,18 +98,19 @@ export default {
   data () {
     return {
       currentPage: 1,
-      source: 'now_playing',
-      movies: [],
       totalPages: 1,
+      source: 'now_playing',
+      errors: [],
+      movies: [],
+      mainCharacters: [],
       ids: [],
       movie: {},
-      tags: '',
       movieToSave: {},
-      errors: [],
+      tags: '',
+      comment: '',
       path_img_movie_300: PATH_IMG_MOVIE_300,
       path_img_movie_200: PATH_IMG_MOVIE_200,
-      path_img_face_138_175: PATH_IMG_FACE_138_175,
-      mainCharacters: []
+      path_img_face_138_175: PATH_IMG_FACE_138_175
     }
   },
   created () {
@@ -188,6 +190,7 @@ export default {
         axios.post(URL_LOCAL_API_MOVIE, this.movieToSave)
           .then(response => {
             this.ids.push(this.movieToSave.id)
+            this.$refs.tagModal.show()
           })
           .catch(e => {
             this.errors.push(e)
@@ -206,11 +209,14 @@ export default {
     onModalSubmit (evt) {
       evt.preventDefault()
       this.movieToSave.tags = this.tags.split(';')
-      axios.post(URL_LOCAL_API_MOVIE, this.movieToSave)
+      this.movieToSave.comment = this.comment
+      axios.put(URL_LOCAL_API_MOVIE, this.movieToSave)
         .catch(e => {
           this.errors.push(e)
         })
-      this.ids.push(this.movieToSave.id)
+      this.$data.comment = ''
+      this.$data.tags = ''
+      this.$refs.tagModal.hide()
     }
   }
 }
@@ -224,6 +230,12 @@ export default {
   }
   .nav-tab > a{
     color: #707984;
+  }
+  .nav-tab > a:hover{
+    color: #414750;
+  }
+  .nav-tab > a:focus{
+    color: #95A0AF;
   }
   .filmRow{
     margin-bottom: 20px;
