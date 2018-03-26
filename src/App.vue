@@ -10,8 +10,8 @@
         <b-navbar-nav class="componentFont">
           <b-nav-item href="#/myMovies">MES FILMS</b-nav-item>
           <b-nav-item href="#/mySeries">MES SÉRIES</b-nav-item>
-          <b-nav-item href="#/latestMovies">FILMS</b-nav-item>
-          <b-nav-item href="#/latestSeries"><b>SÉRIES</b></b-nav-item>
+          <b-nav-item href="#/movies">FILMS</b-nav-item>
+          <b-nav-item href="#/series"><b>SÉRIES</b></b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->

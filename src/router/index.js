@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import MyMovies from '@/components/MyMovies'
-import LatestMovies from '@/components/LatestMovies'
-import LatestSeries from '@/components/LatestSeries'
+import Movies from '@/components/Movies'
+import Series from '@/components/Series'
 
 Vue.use(Router)
 
@@ -11,22 +10,17 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: MyMovies
+      component: Movies
     },
     {
-      path: '/myMovies',
-      name: 'MyMovies',
-      component: MyMovies
+      path: '/movies',
+      name: 'movies',
+      component: Movies
     },
     {
-      path: '/latestMovies',
-      name: 'latestMovies',
-      component: LatestMovies
-    },
-    {
-      path: '/latestSeries',
-      name: 'latestSeries',
-      component: LatestSeries
+      path: '/series',
+      name: 'series',
+      component: Series
     }
   ]
 })
