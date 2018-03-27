@@ -6,6 +6,13 @@ var cors = require('cors')
 
 router.use(cors())
 
+router.get('/movie/one/:id', function (req, res, next) {
+  Movie.findOne({ 'id': req.params.id }, function (err, post) {
+    if (err) return next(err)
+    res.json(post)
+  })
+})
+
 router.get('/movie/page/:page', function (req, res, next) {
   var perPage = 20
   var page = req.params.page || 1
@@ -42,18 +49,17 @@ router.post('/movie', function (req, res, next) {
 
 router.put('/movie', function (req, res, next) {
   var query = {'id': req.body.id}
-  console.log(req.body)
-  console.log(req.body.id)
-  Movie.findOneAndUpdate(query, req.body, {upsert: true}, function (err, doc) {
-    if (err) return res.send(500, { error: err })
+  Movie.findOneAndUpdate(query, {'$set': { 'comment': req.body.comment,
+    'tags': req.body.tags,
+    'title': req.body.title,
+    'poster_path': req.body.poster_path }}, {upsert: true}, function (err) {
+    if (err) return next(err)
     return res.send('succesfully saved')
   })
 })
 
 router.delete('/movie/:id', function (req, res, next) {
-  Movie.deleteOne({
-    id: req.params.id
-  }).exec(function (err, post) {
+  Movie.deleteOne({ id: req.params.id }).exec(function (err, post) {
     if (err) return next(err)
     res.json(post)
   })

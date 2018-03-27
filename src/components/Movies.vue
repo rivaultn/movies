@@ -17,6 +17,7 @@
             <div slot="footer">
               <b-link @click.stop="details(movie)" v-b-modal.detailsModal class="details">détails</b-link><br />
               <b-link @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
+              <b-link @click="editInformations(movie.id)" v-if="ids.includes(movie.id)" class="editLink"><icon class="eye" name="edit" scale="1.6"></icon></b-link>
             </div>
           </b-card>
 
@@ -105,7 +106,7 @@ export default {
       mainCharacters: [],
       ids: [],
       movie: {},
-      movieToSave: {},
+      currentMovie: {},
       tags: '',
       comment: '',
       path_img_movie_300: PATH_IMG_MOVIE_300,
@@ -131,9 +132,14 @@ export default {
       })
   },
   methods: {
+    setSource (source) {
+      this.currentPage = 1
+      this.source = source
+      this.change()
+    },
     details (movie) {
       this.mainCharacters = []
-      this.movieToSave = {}
+      this.currentMovie = {}
       axios.get(URL_API_MOVIE + movie.id + '?api_key=' + API_KEY + '&language=' + LNG)
         .then(response => {
           this.movie = response.data
@@ -148,7 +154,19 @@ export default {
         .catch(e => {
           this.errors.push(e)
         })
-      this.movieToSave.id = movie.id
+      this.currentMovie.id = movie.id
+    },
+    editInformations (id) {
+      axios.get(URL_LOCAL_API_MOVIE + '/one/' + id)
+        .then(response => {
+          this.currentMovie = response.data
+          this.$data.comment = this.currentMovie.comment
+          this.$data.tags = this.currentMovie.tags.join(';')
+          this.$refs.tagModal.show()
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
     },
     change () {
       if (this.source === 'my_movies') {
@@ -177,19 +195,14 @@ export default {
           })
       }
     },
-    setSource (source) {
-      this.currentPage = 1
-      this.source = source
-      this.change()
-    },
     clickOnEye (movie) {
       if (!this.ids.includes(movie.id)) {
-        this.movieToSave.id = movie.id
-        this.movieToSave.poster_path = movie.poster_path
-        this.movieToSave.title = movie.title
-        axios.post(URL_LOCAL_API_MOVIE, this.movieToSave)
+        this.currentMovie.id = movie.id
+        this.currentMovie.poster_path = movie.poster_path
+        this.currentMovie.title = movie.title
+        axios.post(URL_LOCAL_API_MOVIE, this.currentMovie)
           .then(response => {
-            this.ids.push(this.movieToSave.id)
+            this.ids.push(this.currentMovie.id)
             this.$refs.tagModal.show()
           })
           .catch(e => {
@@ -200,6 +213,22 @@ export default {
           .then(response => {
             let idx = this.ids.indexOf(movie.id)
             this.ids.splice(idx, 1)
+            if (this.source === 'my_movies') {
+              axios.get(URL_LOCAL_API_MOVIE + '/page/' + this.currentPage)
+                .then(response => {
+                  this.movies = response.data
+                })
+                .catch(e => {
+                  this.errors.push(e)
+                })
+              axios.get(URL_LOCAL_API_MOVIE + '/total_pages')
+                .then(response => {
+                  this.totalPages = response.data
+                })
+                .catch(e => {
+                  this.errors.push(e)
+                })
+            }
           })
           .catch(e => {
             this.errors.push(e)
@@ -208,14 +237,15 @@ export default {
     },
     onModalSubmit (evt) {
       evt.preventDefault()
-      this.movieToSave.tags = this.tags.split(';')
-      this.movieToSave.comment = this.comment
-      axios.put(URL_LOCAL_API_MOVIE, this.movieToSave)
+      this.currentMovie.tags = this.tags.split(';')
+      this.currentMovie.comment = this.comment
+      axios.put(URL_LOCAL_API_MOVIE, this.currentMovie)
         .catch(e => {
           this.errors.push(e)
         })
       this.$data.comment = ''
       this.$data.tags = ''
+      this.$data.currentMovie = {}
       this.$refs.tagModal.hide()
     }
   }
@@ -231,10 +261,7 @@ export default {
   .nav-tab > a{
     color: #707984;
   }
-  .nav-tab > a:hover{
-    color: #414750;
-  }
-  .nav-tab > a:focus{
+  .nav-tab > a:focus, .nav-tab > a:hover{
     color: #95A0AF;
   }
   .filmRow{
@@ -267,6 +294,9 @@ export default {
   .genreLink{
     font-weight: bold;
     margin-right: 10px;
+  }
+  .editLink{
+    margin-left: 15px;
   }
   .modal-title{
     font-size: 32px;
