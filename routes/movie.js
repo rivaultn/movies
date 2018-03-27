@@ -39,7 +39,6 @@ router.get('/movie/tag/:tag/page/:page', function (req, res, next) {
   Movie.find({'tags': tag})
     .skip((perPage * page) - perPage)
     .limit(perPage)
-    .lean()
     .exec(function (err, movies) {
       if (err) return next(err)
       res.json({total_results: totalResults, movies})
@@ -54,9 +53,9 @@ router.get('/movie/ids', function (req, res, next) {
 })
 
 router.get('/movie/tags', function (req, res, next) {
-  Movie.distinct('tags').exec(function (err, ids) {
+  Movie.distinct('tags').exec(function (err, tags) {
     if (err) return next(err)
-    res.json(ids)
+    res.json(tags.sort())
   })
 })
 

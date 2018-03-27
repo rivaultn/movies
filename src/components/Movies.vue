@@ -2,7 +2,7 @@
   <div>
   <b-container fluid>
       <b-row>
-        <b-col cols="1" offset-md="1" class="tagColumn">
+        <b-col cols="1" offset-md="1" class="tagColumn" v-if="source == 'my_movies'">
           <h3>TAGS</h3>
           <ul id="tagsList">
             <li v-for="savedTag in savedTags" :key="savedTag">
@@ -119,7 +119,7 @@ export default {
       movie: {},
       currentMovie: {},
       tags: '',
-      savedTags: ['test', 'xd', 'epepe'],
+      savedTags: [],
       comment: '',
       path_img_movie_300: PATH_IMG_MOVIE_300,
       path_img_movie_200: PATH_IMG_MOVIE_200,
@@ -142,13 +142,7 @@ export default {
       .catch(e => {
         this.errors.push(e)
       })
-    axios.get(URL_LOCAL_API_MOVIE + '/tags')
-      .then(response => {
-        this.savedTags = response.data
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
+    this.loadTags()
   },
   methods: {
     setSource (source) {
@@ -174,6 +168,15 @@ export default {
           this.errors.push(e)
         })
       this.currentMovie.id = movie.id
+    },
+    loadTags () {
+      axios.get(URL_LOCAL_API_MOVIE + '/tags')
+        .then(response => {
+          this.savedTags = response.data
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
     },
     filterByTag (tag) {
       axios.get(URL_LOCAL_API_MOVIE + '/tag/' + tag + '/page/' + this.currentPage)
@@ -245,6 +248,7 @@ export default {
                 .catch(e => {
                   this.errors.push(e)
                 })
+              this.loadTags()
             }
           })
           .catch(e => {
@@ -257,6 +261,9 @@ export default {
       this.currentMovie.tags = this.tags.split(';')
       this.currentMovie.comment = this.comment
       axios.put(URL_LOCAL_API_MOVIE, this.currentMovie)
+        .then(response => {
+          this.loadTags()
+        })
         .catch(e => {
           this.errors.push(e)
         })
