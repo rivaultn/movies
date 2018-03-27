@@ -24,7 +24,7 @@
         </b-card-group>
       </b-col>
     <b-row class="justify-content-md-center paginationRow">
-      <b-pagination-nav :link-gen="change" :number-of-pages="totalPages" v-model="currentPage" class="componentFont"/>
+      <b-pagination v-on:input="change" :total-rows="totalResults" :per-page="20" v-model="currentPage" class="componentFont"/>
     </b-row>
 
     <b-modal id="detailsModal"
@@ -99,7 +99,7 @@ export default {
   data () {
     return {
       currentPage: 1,
-      totalPages: 1,
+      totalResults: 1,
       source: 'now_playing',
       errors: [],
       movies: [],
@@ -118,7 +118,7 @@ export default {
     axios.get(URL_API_MOVIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
       .then(response => {
         this.movies = response.data.results
-        this.totalPages = response.data.total_pages
+        this.totalResults = response.data.total_results
       })
       .catch(e => {
         this.errors.push(e)
@@ -177,9 +177,9 @@ export default {
           .catch(e => {
             this.errors.push(e)
           })
-        axios.get(URL_LOCAL_API_MOVIE + '/total_pages')
+        axios.get(URL_LOCAL_API_MOVIE + '/total_results')
           .then(response => {
-            this.totalPages = response.data
+            this.totalResults = response.data
           })
           .catch(e => {
             this.errors.push(e)
@@ -188,7 +188,7 @@ export default {
         axios.get(URL_API_MOVIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
           .then(response => {
             this.movies = response.data.results
-            this.totalPages = response.data.total_pages
+            this.totalResults = response.data.total_results
           })
           .catch(e => {
             this.errors.push(e)
@@ -221,9 +221,9 @@ export default {
                 .catch(e => {
                   this.errors.push(e)
                 })
-              axios.get(URL_LOCAL_API_MOVIE + '/total_pages')
+              axios.get(URL_LOCAL_API_MOVIE + '/total_results')
                 .then(response => {
-                  this.totalPages = response.data
+                  this.totalResults = response.data
                 })
                 .catch(e => {
                   this.errors.push(e)

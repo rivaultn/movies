@@ -25,11 +25,10 @@ router.get('/movie/page/:page', function (req, res, next) {
     })
 })
 
-router.get('/movie/total_pages', function (req, res, next) {
-  var perPage = 20
+router.get('/movie/total_results', function (req, res, next) {
   Movie.find({}).count().exec(function (err, count) {
     if (err) return next(err)
-    res.json(Math.ceil(count / perPage))
+    res.json(count)
   })
 })
 
