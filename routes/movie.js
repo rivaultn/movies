@@ -16,24 +16,45 @@ router.get('/movie/one/:id', function (req, res, next) {
 router.get('/movie/page/:page', function (req, res, next) {
   var perPage = 20
   var page = req.params.page || 1
-  Movie.find({})
-    .skip((perPage * page) - perPage)
-    .limit(perPage)
-    .exec(function (err, products) {
-      if (err) return next(err)
-      res.json(products)
-    })
+  Movie.find({}).count().exec(function (err, totalResults) {
+    if (err) return next(err)
+    Movie.find({})
+      .skip((perPage * page) - perPage)
+      .limit(perPage)
+      .exec(function (err, movies) {
+        if (err) return next(err)
+        res.json({total_results: totalResults, movies})
+      })
+  })
 })
 
-router.get('/movie/total_results', function (req, res, next) {
-  Movie.find({}).count().exec(function (err, count) {
+router.get('/movie/tag/:tag/page/:page', function (req, res, next) {
+  var perPage = 20
+  var page = req.params.page || 1
+  var tag = req.params.tag || ''
+  var totalResults = 1
+  Movie.find({'tags': tag}).count().exec(function (err, totalResults) {
     if (err) return next(err)
-    res.json(count)
   })
+  Movie.find({'tags': tag})
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .lean()
+    .exec(function (err, movies) {
+      if (err) return next(err)
+      res.json({total_results: totalResults, movies})
+    })
 })
 
 router.get('/movie/ids', function (req, res, next) {
   Movie.distinct('id').exec(function (err, ids) {
+    if (err) return next(err)
+    res.json(ids)
+  })
+})
+
+router.get('/movie/tags', function (req, res, next) {
+  Movie.distinct('tags').exec(function (err, ids) {
     if (err) return next(err)
     res.json(ids)
   })

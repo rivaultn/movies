@@ -1,28 +1,38 @@
 <template>
-  <b-container>
-      <b-col>
-        <b-nav>
-          <b-nav-item @click="setSource('now_playing')" active class="nav-tab">EN SALLE</b-nav-item>
-          <b-nav-item @click="setSource('popular')" class="nav-tab">POPULAIRE</b-nav-item>
-          <b-nav-item @click="setSource('top_rated')" class="nav-tab">MIEUX NOTÉS</b-nav-item>
-          <b-nav-item @click="setSource('my_movies')" class="nav-tab">MES FILMS</b-nav-item>
-        </b-nav>
+  <div>
+  <b-container fluid>
+      <b-row>
+        <b-col cols="1" offset-md="1" class="tagColumn">
+          <h3>TAGS</h3>
+          <ul id="tagsList">
+            <li v-for="savedTag in savedTags" :key="savedTag">
+              <b-link @click="filterByTag(savedTag)" class="details">{{ savedTag}}</b-link>
+            </li>
+          </ul>
+        </b-col>
+        <b-col cols="8" offset-md="1">
+          <b-nav>
+            <b-nav-item @click="setSource('now_playing')" active class="nav-tab">EN SALLE</b-nav-item>
+            <b-nav-item @click="setSource('popular')" class="nav-tab">POPULAIRE</b-nav-item>
+            <b-nav-item @click="setSource('top_rated')" class="nav-tab">MIEUX NOTÉS</b-nav-item>
+            <b-nav-item @click="setSource('my_movies')" class="nav-tab">MES FILMS</b-nav-item>
+          </b-nav>
 
-        <b-card-group deck v-for="i in Math.ceil(movies.length / 5)" :key="i" class="filmRow">
-          <b-card class="cardMovie" v-for="movie in movies.slice((i - 1) * 5, i * 5)" :key="movie.id" bg-variant="dark"
-                    :title="movie.title"
-                    :img-src="movie.poster_path ? path_img_movie_300+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
-                    img-alt="Img"
-                    img-top>
-            <div slot="footer">
-              <b-link @click.stop="details(movie)" v-b-modal.detailsModal class="details">détails</b-link><br />
-              <b-link @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
-              <b-link @click="editInformations(movie.id)" v-if="ids.includes(movie.id)" class="editLink"><icon class="eye" name="edit" scale="1.6"></icon></b-link>
-            </div>
-          </b-card>
-
-        </b-card-group>
-      </b-col>
+          <b-card-group deck v-for="i in Math.ceil(movies.length / 5)" :key="i" class="filmRow">
+            <b-card class="cardMovie" v-for="movie in movies.slice((i - 1) * 5, i * 5)" :key="movie.id" bg-variant="dark"
+                      :title="movie.title"
+                      :img-src="movie.poster_path ? path_img_movie_300+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
+                      img-alt="Img"
+                      img-top>
+              <div slot="footer">
+                <b-link @click.stop="details(movie)" v-b-modal.detailsModal class="details">détails</b-link><br />
+                <b-link @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
+                <b-link @click="editInformations(movie.id)" v-if="ids.includes(movie.id)" class="editLink"><icon class="eye" name="edit" scale="1.6"></icon></b-link>
+              </div>
+            </b-card>
+          </b-card-group>
+        </b-col>
+      </b-row>
     <b-row class="justify-content-md-center paginationRow">
       <b-pagination v-on:input="change" :total-rows="totalResults" :per-page="20" v-model="currentPage" class="componentFont"/>
     </b-row>
@@ -88,6 +98,7 @@
       </b-form>
     </b-modal>
   </b-container>
+  </div>
 </template>
 
 <script>
@@ -108,6 +119,7 @@ export default {
       movie: {},
       currentMovie: {},
       tags: '',
+      savedTags: ['test', 'xd', 'epepe'],
       comment: '',
       path_img_movie_300: PATH_IMG_MOVIE_300,
       path_img_movie_200: PATH_IMG_MOVIE_200,
@@ -126,6 +138,13 @@ export default {
     axios.get(URL_LOCAL_API_MOVIE + '/ids')
       .then(response => {
         this.ids = response.data
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
+    axios.get(URL_LOCAL_API_MOVIE + '/tags')
+      .then(response => {
+        this.savedTags = response.data
       })
       .catch(e => {
         this.errors.push(e)
@@ -156,6 +175,16 @@ export default {
         })
       this.currentMovie.id = movie.id
     },
+    filterByTag (tag) {
+      axios.get(URL_LOCAL_API_MOVIE + '/tag/' + tag + '/page/' + this.currentPage)
+        .then(response => {
+          this.movies = response.data.movies
+          this.totalResults = response.data.total_results
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
+    },
     editInformations (id) {
       axios.get(URL_LOCAL_API_MOVIE + '/one/' + id)
         .then(response => {
@@ -172,14 +201,8 @@ export default {
       if (this.source === 'my_movies') {
         axios.get(URL_LOCAL_API_MOVIE + '/page/' + this.currentPage)
           .then(response => {
-            this.movies = response.data
-          })
-          .catch(e => {
-            this.errors.push(e)
-          })
-        axios.get(URL_LOCAL_API_MOVIE + '/total_results')
-          .then(response => {
-            this.totalResults = response.data
+            this.movies = response.data.movies
+            this.totalResults = response.data.total_results
           })
           .catch(e => {
             this.errors.push(e)
@@ -216,14 +239,8 @@ export default {
             if (this.source === 'my_movies') {
               axios.get(URL_LOCAL_API_MOVIE + '/page/' + this.currentPage)
                 .then(response => {
-                  this.movies = response.data
-                })
-                .catch(e => {
-                  this.errors.push(e)
-                })
-              axios.get(URL_LOCAL_API_MOVIE + '/total_results')
-                .then(response => {
-                  this.totalResults = response.data
+                  this.movies = response.data.movies
+                  this.totalResults = response.data.total_results
                 })
                 .catch(e => {
                   this.errors.push(e)
@@ -263,6 +280,22 @@ export default {
   }
   .nav-tab > a:focus, .nav-tab > a:hover{
     color: #95A0AF;
+  }
+  .tagColumn{
+    padding-top: 35px;
+  }
+  .tagColumn > h3,  #tagsList > li > a{
+    color: #707984;
+    font-weight: bold;
+  }
+  #tagsList{
+    list-style-type: none;
+    padding-top: 20px;
+    /*padding-left:0;*/
+    text-align: left;
+  }
+  #tagsList > li > a{
+    font-size: 28px;
   }
   .filmRow{
     margin-bottom: 20px;
