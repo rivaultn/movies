@@ -5,7 +5,8 @@ var MovieSchema = new mongoose.Schema({
   comment: String,
   tags: [String],
   title: String,
-  poster_path: String
+  poster_path: String,
+  genres: [Number]
 })
 
 module.exports = mongoose.model('Movie', MovieSchema)

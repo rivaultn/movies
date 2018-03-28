@@ -6,7 +6,13 @@
           <ul class="filterList">
             <h3>TAGS</h3>
             <li v-for="savedTag in savedTags" :key="savedTag">
-              <b-link @click="filterByTag(savedTag)" class="details">{{ savedTag}}</b-link>
+              <b-link @click="filterByTag(savedTag)" class="filterLink">{{ savedTag}}</b-link>
+            </li>
+          </ul>
+          <ul class="filterList">
+            <h3>GENRES</h3>
+            <li v-for="genre in genres" :key="genre.id">
+              <b-link @click="filterBySavedGenre(genre.id)" class="filterLink">{{ genre.name}}</b-link>
             </li>
           </ul>
         </b-col>
@@ -14,7 +20,7 @@
           <ul class="filterList">
             <h3>GENRES</h3>
             <li v-for="genre in genres" :key="genre.id">
-              <b-link @click="filterByGenre(genre)" class="details">{{ genre.name}}</b-link>
+              <b-link @click="filterByGenre(genre)" class="filterLink">{{ genre.name}}</b-link>
             </li>
           </ul>
         </b-col>
@@ -220,6 +226,16 @@ export default {
           this.errors.push(e)
         })
     },
+    filterBySavedGenre (idGenre) {
+      axios.get(URL_LOCAL_API_MOVIE + '/genre/' + idGenre + '/page/' + this.currentPage)
+        .then(response => {
+          this.movies = response.data.movies
+          this.totalResults = response.data.total_results
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
+    },
     editInformations (id) {
       axios.get(URL_LOCAL_API_MOVIE + '/one/' + id)
         .then(response => {
@@ -266,6 +282,7 @@ export default {
         this.currentMovie.id = movie.id
         this.currentMovie.poster_path = movie.poster_path
         this.currentMovie.title = movie.title
+        this.currentMovie.genres = movie.genre_ids
         axios.post(URL_LOCAL_API_MOVIE, this.currentMovie)
           .then(response => {
             this.ids.push(this.currentMovie.id)
@@ -361,12 +378,12 @@ export default {
   .saved{
     color: #2D63A1;
   }
-  .details, .genreLink{
+  .details, .filterLink, .genreLink{
     font-size: 22px;
     color: inherit;
     text-decoration: inherit;
   }
-  .details:hover, .genreLink:hover{
+  .details:hover, .filterLink:hover, .genreLink:hover{
     color: inherit;
     text-decoration: inherit;
   }

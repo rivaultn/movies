@@ -32,17 +32,32 @@ router.get('/movie/tag/:tag/page/:page', function (req, res, next) {
   var perPage = 20
   var page = req.params.page || 1
   var tag = req.params.tag || ''
-  var totalResults = 1
   Movie.find({'tags': tag}).count().exec(function (err, totalResults) {
     if (err) return next(err)
+    Movie.find({'tags': tag})
+      .skip((perPage * page) - perPage)
+      .limit(perPage)
+      .exec(function (err, movies) {
+        if (err) return next(err)
+        res.json({total_results: totalResults, movies})
+      })
   })
-  Movie.find({'tags': tag})
-    .skip((perPage * page) - perPage)
-    .limit(perPage)
-    .exec(function (err, movies) {
-      if (err) return next(err)
-      res.json({total_results: totalResults, movies})
-    })
+})
+
+router.get('/movie/genre/:genre/page/:page', function (req, res, next) {
+  var perPage = 20
+  var page = req.params.page || 1
+  var genre = req.params.genre || ''
+  Movie.find({'genres': genre}).count().exec(function (err, totalResults) {
+    if (err) return next(err)
+    Movie.find({'genres': genre})
+      .skip((perPage * page) - perPage)
+      .limit(perPage)
+      .exec(function (err, movies) {
+        if (err) return next(err)
+        res.json({total_results: totalResults, movies})
+      })
+  })
 })
 
 router.get('/movie/ids', function (req, res, next) {
