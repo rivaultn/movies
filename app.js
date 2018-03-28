@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var movie = require('./routes/movie');
+var serie = require('./routes/serie');
 var app = express();
 
 app.use(logger('dev'));
@@ -12,6 +13,8 @@ app.use(bodyParser.urlencoded({'extended':'false'}));
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/movies', express.static(path.join(__dirname, 'dist')));
 app.use('/movie', movie);
+app.use('/series', express.static(path.join(__dirname, 'dist')));
+app.use('/serie', serie);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

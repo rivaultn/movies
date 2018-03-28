@@ -35,7 +35,7 @@
           <b-card-group deck v-for="i in Math.ceil(movies.length / 5)" :key="i" class="filmRow">
             <b-card class="cardMovie" v-for="movie in movies.slice((i - 1) * 5, i * 5)" :key="movie.id" bg-variant="dark"
                       :title="movie.title"
-                      :img-src="movie.poster_path ? path_img_movie_300+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
+                      :img-src="movie.poster_path ? PATH_IMG_300+movie.poster_path  : require('../assets/No_Image_Available.jpg')"
                       img-alt="Img"
                       img-top>
               <div slot="footer">
@@ -64,7 +64,7 @@
       <b-container fluid class="modal-text">
         <b-row>
           <b-col cols="4">
-            <b-img fluid :src="movie.poster_path ? path_img_movie_200+movie.poster_path  : require('../assets/No_Image_Available.jpg')" alt="left image" />
+            <b-img fluid :src="movie.poster_path ? PATH_IMG_200+movie.poster_path  : require('../assets/No_Image_Available.jpg')" alt="left image" />
           </b-col>
           <b-col>
           <h4 class="synopsis">Synopsis : </h4>
@@ -118,7 +118,7 @@
 
 <script>
 import axios from 'axios'
-import {URL_API_MOVIE, URL_LOCAL_API_MOVIE, URL_API__DISCOVER_MOVIE, URL_API__GENRE_MOVIE, API_KEY, PATH_IMG_MOVIE_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_MOVIE_200} from '../constant.js'
+import {URL_API_MOVIE, URL_LOCAL_API_MOVIE, URL_API__DISCOVER_MOVIE, URL_API_GENRE, API_KEY, PATH_IMG_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_200} from '../constant.js'
 
 export default {
   name: 'MovieList',
@@ -138,8 +138,8 @@ export default {
       savedTags: [],
       genres: [],
       comment: '',
-      path_img_movie_300: PATH_IMG_MOVIE_300,
-      path_img_movie_200: PATH_IMG_MOVIE_200,
+      PATH_IMG_300: PATH_IMG_300,
+      PATH_IMG_200: PATH_IMG_200,
       path_img_face_138_175: PATH_IMG_FACE_138_175
     }
   },
@@ -159,7 +159,7 @@ export default {
       .catch(e => {
         this.errors.push(e)
       })
-    axios.get(URL_API__GENRE_MOVIE + '/movie/list?api_key=' + API_KEY + '&language=' + LNG)
+    axios.get(URL_API_GENRE + '/movie/list?api_key=' + API_KEY + '&language=' + LNG)
       .then(response => {
         this.genres = response.data.genres
       })
