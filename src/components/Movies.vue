@@ -2,15 +2,23 @@
   <div>
   <b-container fluid>
       <b-row>
-        <b-col cols="1" offset-md="1" class="tagColumn" v-if="source == 'my_movies'">
-          <h3>TAGS</h3>
-          <ul id="tagsList">
+        <b-col class="filterColumn" sm="1" v-if="source == 'my_movies'">
+          <ul class="filterList">
+            <h3>TAGS</h3>
             <li v-for="savedTag in savedTags" :key="savedTag">
               <b-link @click="filterByTag(savedTag)" class="details">{{ savedTag}}</b-link>
             </li>
           </ul>
         </b-col>
-        <b-col cols="8" offset-md="1">
+        <b-col class="filterColumn" sm="1" v-else>
+          <ul class="filterList">
+            <h3>GENRES</h3>
+            <li v-for="genre in genres" :key="genre.id">
+              <b-link @click="filterByGenre(genre)" class="details">{{ genre.name}}</b-link>
+            </li>
+          </ul>
+        </b-col>
+        <b-col offset-sm="1" sm="10">
           <b-nav>
             <b-nav-item @click="setSource('now_playing')" active class="nav-tab">EN SALLE</b-nav-item>
             <b-nav-item @click="setSource('popular')" class="nav-tab">POPULAIRE</b-nav-item>
@@ -33,7 +41,7 @@
           </b-card-group>
         </b-col>
       </b-row>
-    <b-row class="justify-content-md-center paginationRow">
+    <b-row class="justify-content-md-center justify-content-sm-center paginationRow">
       <b-pagination v-on:input="change" :total-rows="totalResults" :per-page="20" v-model="currentPage" class="componentFont"/>
     </b-row>
 
@@ -44,7 +52,8 @@
              footer-bg-variant="dark"
              footer-text-variant="light"
              :hide-footer=false
-              size="lg">
+              size="lg"
+             ref="detailsModal">
 
       <b-container fluid class="modal-text">
         <b-row>
@@ -54,7 +63,7 @@
           <b-col>
           <h4 class="synopsis">Synopsis : </h4>
             <span>{{ movie.overview }}</span><br /><br />
-            <b-link class="genreLink" v-for="genre in movie.genres" :key="genre.id"> {{genre.name}} </b-link>
+            <b-link @click="filterByGenre(genre)" class="genreLink" v-for="genre in movie.genres" :key="genre.id"> {{genre.name}} </b-link>
           </b-col>
         </b-row>
         <b-row class="mainCharacters">
@@ -103,7 +112,7 @@
 
 <script>
 import axios from 'axios'
-import {URL_API_MOVIE, URL_LOCAL_API_MOVIE, API_KEY, PATH_IMG_MOVIE_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_MOVIE_200} from '../constant.js'
+import {URL_API_MOVIE, URL_LOCAL_API_MOVIE, URL_API__DISCOVER_MOVIE, URL_API__GENRE_MOVIE, API_KEY, PATH_IMG_MOVIE_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_MOVIE_200} from '../constant.js'
 
 export default {
   name: 'MovieList',
@@ -118,8 +127,10 @@ export default {
       ids: [],
       movie: {},
       currentMovie: {},
+      currentGenre: 1,
       tags: '',
       savedTags: [],
+      genres: [],
       comment: '',
       path_img_movie_300: PATH_IMG_MOVIE_300,
       path_img_movie_200: PATH_IMG_MOVIE_200,
@@ -138,6 +149,13 @@ export default {
     axios.get(URL_LOCAL_API_MOVIE + '/ids')
       .then(response => {
         this.ids = response.data
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
+    axios.get(URL_API__GENRE_MOVIE + '/movie/list?api_key=' + API_KEY + '&language=' + LNG)
+      .then(response => {
+        this.genres = response.data.genres
       })
       .catch(e => {
         this.errors.push(e)
@@ -178,6 +196,20 @@ export default {
           this.errors.push(e)
         })
     },
+    filterByGenre (genre) {
+      axios.get(URL_API__DISCOVER_MOVIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
+        '&include_video=false&page=' + this.currentPage + '&with_genres=' + genre.id)
+        .then(response => {
+          this.source = 'genre'
+          this.currentGenre = genre.id
+          this.movies = response.data.results
+          this.totalResults = response.data.total_results
+          this.$refs.detailsModal.hide()
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
+    },
     filterByTag (tag) {
       axios.get(URL_LOCAL_API_MOVIE + '/tag/' + tag + '/page/' + this.currentPage)
         .then(response => {
@@ -210,13 +242,21 @@ export default {
           .catch(e => {
             this.errors.push(e)
           })
+      } else if (this.source === 'genre') {
+        axios.get(URL_API__DISCOVER_MOVIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
+          '&include_video=false&page=' + this.currentPage + '&with_genres=' + this.currentGenre)
+          .then(response => {
+            this.movies = response.data.results
+            this.totalResults = response.data.total_results
+          }).catch(e => {
+            this.errors.push(e)
+          })
       } else {
         axios.get(URL_API_MOVIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
           .then(response => {
             this.movies = response.data.results
             this.totalResults = response.data.total_results
-          })
-          .catch(e => {
+          }).catch(e => {
             this.errors.push(e)
           })
       }
@@ -288,20 +328,19 @@ export default {
   .nav-tab > a:focus, .nav-tab > a:hover{
     color: #95A0AF;
   }
-  .tagColumn{
+  .filterColumn{
     padding-top: 35px;
   }
-  .tagColumn > h3,  #tagsList > li > a{
+  .filterList > h3,  .filterList > li > a{
     color: #707984;
     font-weight: bold;
   }
-  #tagsList{
+  .filterList{
     list-style-type: none;
     padding-top: 20px;
-    /*padding-left:0;*/
     text-align: left;
   }
-  #tagsList > li > a{
+  .filterList > li > a{
     font-size: 28px;
   }
   .filmRow{
