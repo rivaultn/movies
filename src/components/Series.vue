@@ -53,6 +53,9 @@
                 <b-link @click.stop="details(serie)" v-b-modal.detailsModal class="details">détails</b-link><br />
                 <b-link @click="clickOnEye(serie)"><icon v-bind:class="{'saved': ids.includes(serie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
                 <b-link @click="editInformations(serie.id)" v-if="ids.includes(serie.id)" class="editLink"><icon class="eye" name="edit" scale="1.6"></icon></b-link>
+                <p class="card-text">
+                  <span v-if="ids.includes(serie.id)">{{ serie.comment }}</span>
+                </p>
               </div>
             </b-card>
           </b-card-group>
@@ -345,7 +348,7 @@ export default {
       if (!this.ids.includes(serie.id)) {
         this.currentSerie.id = serie.id
         this.currentSerie.poster_path = serie.poster_path
-        this.currentSerie.title = serie.name
+        this.currentSerie.name = serie.name
         this.currentSerie.genres = serie.genre_ids
         axios.post(URL_LOCAL_API_SERIE, this.currentSerie)
           .then(response => {

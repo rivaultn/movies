@@ -4,7 +4,7 @@ var SerieSchema = new mongoose.Schema({
   id: Number,
   comment: String,
   tags: [String],
-  title: String,
+  name: String,
   poster_path: String,
   genres: [Number]
 })

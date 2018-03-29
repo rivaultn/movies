@@ -53,6 +53,9 @@
                 <b-link @click.stop="details(movie)" v-b-modal.detailsModal class="details">détails</b-link><br />
                 <b-link @click="clickOnEye(movie)"><icon v-bind:class="{'saved': ids.includes(movie.id)}" class="eye" name="eye" scale="2"></icon></b-link>
                 <b-link @click="editInformations(movie.id)" v-if="ids.includes(movie.id)" class="editLink"><icon class="eye" name="edit" scale="1.6"></icon></b-link>
+                <p class="card-text">
+                  <span v-if="ids.includes(movie.id)">{{ movie.comment }}</span>
+                </p>
               </div>
             </b-card>
           </b-card-group>
