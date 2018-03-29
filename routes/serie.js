@@ -60,6 +60,22 @@ router.get('/serie/genre/:genre/page/:page', function (req, res, next) {
   })
 })
 
+router.get('/serie/search/:keyword/page/:page', function (req, res, next) {
+  var perPage = 20
+  var page = req.params.page || 1
+  var keyword = req.params.keyword || ''
+  Serie.find({ title: { $regex: '.*' + keyword + '.*', $options: 'i' } }).count().exec(function (err, totalResults) {
+    if (err) return next(err)
+    Serie.find({ title: { $regex: '.*' + keyword + '.*', $options: 'i' } })
+      .skip((perPage * page) - perPage)
+      .limit(perPage)
+      .exec(function (err, series) {
+        if (err) return next(err)
+        res.json({total_results: totalResults, series})
+      })
+  })
+})
+
 router.get('/serie/ids', function (req, res, next) {
   Serie.distinct('id').exec(function (err, ids) {
     if (err) return next(err)

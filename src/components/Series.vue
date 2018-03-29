@@ -24,17 +24,28 @@
             </li>
           </ul>
         </b-col>
-        <b-col offset-sm="1" sm="10">
+        <b-col offset-sm="1" sm="9">
           <b-nav>
             <b-nav-item @click="setSource('on_the_air')" active class="nav-tab">EN SALLE</b-nav-item>
             <b-nav-item @click="setSource('popular')" class="nav-tab">POPULAIRE</b-nav-item>
-            <b-nav-item @click="setSource('top_rated')" class="nav-tab">MIEUX NOTÉS</b-nav-item>
+            <b-nav-item @click="setSource('top_rated')" class="nav-tab">MIEUX NOTÉES</b-nav-item>
             <b-nav-item @click="setSource('my_series')" class="nav-tab">MES SÉRIES</b-nav-item>
           </b-nav>
 
+          <b-form @submit="search" class="searchForm">
+            <b-row class="my-1">
+              <b-col sm="4">
+                <b-form-input id="input-search" type="text" class="componentFont" placeholder="recherche" v-model="searchKeyword"></b-form-input>
+              </b-col>
+              <b-col sm="2">
+                <b-button type="submit" class="componentFont">Rechercher</b-button>
+              </b-col>
+            </b-row>
+          </b-form>
+
           <b-card-group deck v-for="i in Math.ceil(series.length / 5)" :key="i" class="serieRow">
             <b-card class="cardserie" v-for="serie in series.slice((i - 1) * 5, i * 5)" :key="serie.id" bg-variant="dark"
-                    :title="serie.title"
+                    :title="serie.name"
                     :img-src="serie.poster_path ? PATH_IMG_300+serie.poster_path  : require('../assets/No_Image_Available.jpg')"
                     img-alt="Img"
                     img-top>
@@ -52,7 +63,7 @@
       </b-row>
 
       <b-modal id="detailsModal"
-               :title= "serie.title"
+               :title= "serie.name"
                header-bg-variant="dark"
                header-text-variant="light"
                footer-bg-variant="dark"
@@ -118,7 +129,7 @@
 
 <script>
 import axios from 'axios'
-import {URL_API_SERIE, URL_LOCAL_API_SERIE, URL_API__DISCOVER_SERIE, URL_API_GENRE, API_KEY, PATH_IMG_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_200} from '../constant.js'
+import {URL_API_SERIE, URL_LOCAL_API_SERIE, URL_API__DISCOVER_SERIE, URL_API_GENRE, URL_API_SEARCH, API_KEY, PATH_IMG_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_200} from '../constant.js'
 
 export default {
   name: 'serieList',
@@ -127,6 +138,7 @@ export default {
       currentPage: 1,
       totalResults: 1,
       source: 'on_the_air',
+      searchResults: false,
       errors: [],
       series: [],
       mainCharacters: [],
@@ -134,6 +146,7 @@ export default {
       serie: {},
       currentSerie: {},
       currentGenre: 1,
+      searchKeyword: '',
       tags: '',
       savedTags: [],
       genres: [],
@@ -172,6 +185,7 @@ export default {
     setSource (source) {
       this.currentPage = 1
       this.source = source
+      this.searchResults = false
       this.change()
     },
     details (serie) {
@@ -203,6 +217,7 @@ export default {
         })
     },
     filterByGenre (genre) {
+      this.searchResults = false
       axios.get(URL_API__DISCOVER_SERIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
         '&include_video=false&page=' + this.currentPage + '&with_genres=' + genre.id)
         .then(response => {
@@ -217,6 +232,7 @@ export default {
         })
     },
     filterByTag (tag) {
+      this.searchResults = false
       axios.get(URL_LOCAL_API_SERIE + '/tag/' + tag + '/page/' + this.currentPage)
         .then(response => {
           this.series = response.data.series
@@ -227,6 +243,7 @@ export default {
         })
     },
     filterBySavedGenre (idGenre) {
+      this.searchResults = false
       axios.get(URL_LOCAL_API_SERIE + '/genre/' + idGenre + '/page/' + this.currentPage)
         .then(response => {
           this.series = response.data.series
@@ -249,8 +266,62 @@ export default {
         })
     },
     change () {
+      if (this.searchResults) {
+        if (this.source === 'my_series') {
+          axios.get(URL_LOCAL_API_SERIE + '/search/' + this.searchKeyword + '/page/' + this.currentPage)
+            .then(response => {
+              this.series = response.data.series
+              this.totalResults = response.data.total_results
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        } else {
+          axios.get(URL_API_SEARCH + 'tv?api_key=' + API_KEY + '&language=' + LNG + '&query=' + this.searchKeyword +
+            '&page=' + this.currentPage + '&include_adult=false')
+            .then(response => {
+              this.series = response.data.results
+              this.totalResults = response.data.total_results
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        }
+      } else {
+        if (this.source === 'my_series') {
+          axios.get(URL_LOCAL_API_SERIE + '/page/' + this.currentPage)
+            .then(response => {
+              this.series = response.data.series
+              this.totalResults = response.data.total_results
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        } else if (this.source === 'genre') {
+          axios.get(URL_API__DISCOVER_SERIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
+            '&include_video=false&page=' + this.currentPage + '&with_genres=' + this.currentGenre)
+            .then(response => {
+              this.series = response.data.results
+              this.totalResults = response.data.total_results
+            }).catch(e => {
+              this.errors.push(e)
+            })
+        } else {
+          axios.get(URL_API_SERIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
+            .then(response => {
+              this.series = response.data.results
+              this.totalResults = response.data.total_results
+            }).catch(e => {
+              this.errors.push(e)
+            })
+        }
+      }
+    },
+    search () {
+      this.searchResults = true
+      this.currentPage = 1
       if (this.source === 'my_series') {
-        axios.get(URL_LOCAL_API_SERIE + '/page/' + this.currentPage)
+        axios.get(URL_LOCAL_API_SERIE + '/search/' + this.searchKeyword + '/page/' + this.currentPage)
           .then(response => {
             this.series = response.data.series
             this.totalResults = response.data.total_results
@@ -258,21 +329,14 @@ export default {
           .catch(e => {
             this.errors.push(e)
           })
-      } else if (this.source === 'genre') {
-        axios.get(URL_API__DISCOVER_SERIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
-          '&include_video=false&page=' + this.currentPage + '&with_genres=' + this.currentGenre)
-          .then(response => {
-            this.series = response.data.results
-            this.totalResults = response.data.total_results
-          }).catch(e => {
-            this.errors.push(e)
-          })
       } else {
-        axios.get(URL_API_SERIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
+        axios.get(URL_API_SEARCH + 'tv?api_key=' + API_KEY + '&language=' + LNG + '&query=' + this.searchKeyword +
+          '&page=' + this.currentPage + '&include_adult=false')
           .then(response => {
             this.series = response.data.results
             this.totalResults = response.data.total_results
-          }).catch(e => {
+          })
+          .catch(e => {
             this.errors.push(e)
           })
       }
@@ -281,7 +345,7 @@ export default {
       if (!this.ids.includes(serie.id)) {
         this.currentSerie.id = serie.id
         this.currentSerie.poster_path = serie.poster_path
-        this.currentSerie.title = serie.title
+        this.currentSerie.title = serie.name
         this.currentSerie.genres = serie.genre_ids
         axios.post(URL_LOCAL_API_SERIE, this.currentSerie)
           .then(response => {
@@ -360,7 +424,7 @@ export default {
   .filterList > li > a{
     font-size: 28px;
   }
-  .serieRow{
+  .serieRow, .searchForm{
     margin-bottom: 20px;
   }
   .cardserie{

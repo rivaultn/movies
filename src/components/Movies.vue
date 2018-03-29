@@ -24,13 +24,24 @@
             </li>
           </ul>
         </b-col>
-        <b-col offset-sm="1" sm="10">
+        <b-col offset-sm="1" sm="9">
           <b-nav>
             <b-nav-item @click="setSource('now_playing')" active class="nav-tab">EN SALLE</b-nav-item>
             <b-nav-item @click="setSource('popular')" class="nav-tab">POPULAIRE</b-nav-item>
             <b-nav-item @click="setSource('top_rated')" class="nav-tab">MIEUX NOTÉS</b-nav-item>
             <b-nav-item @click="setSource('my_movies')" class="nav-tab">MES FILMS</b-nav-item>
           </b-nav>
+
+          <b-form @submit="search" class="searchForm">
+            <b-row class="my-1">
+              <b-col sm="4">
+                <b-form-input id="input-search" type="text" class="componentFont" placeholder="recherche" v-model="searchKeyword"></b-form-input>
+              </b-col>
+              <b-col sm="2">
+                <b-button type="submit" class="componentFont">Rechercher</b-button>
+              </b-col>
+            </b-row>
+          </b-form>
 
           <b-card-group deck v-for="i in Math.ceil(movies.length / 5)" :key="i" class="filmRow">
             <b-card class="cardMovie" v-for="movie in movies.slice((i - 1) * 5, i * 5)" :key="movie.id" bg-variant="dark"
@@ -118,7 +129,7 @@
 
 <script>
 import axios from 'axios'
-import {URL_API_MOVIE, URL_LOCAL_API_MOVIE, URL_API__DISCOVER_MOVIE, URL_API_GENRE, API_KEY, PATH_IMG_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_200} from '../constant.js'
+import {URL_API_MOVIE, URL_LOCAL_API_MOVIE, URL_API__DISCOVER_MOVIE, URL_API_GENRE, URL_API_SEARCH, API_KEY, PATH_IMG_300, LNG, PATH_IMG_FACE_138_175, PATH_IMG_200} from '../constant.js'
 
 export default {
   name: 'MovieList',
@@ -127,6 +138,7 @@ export default {
       currentPage: 1,
       totalResults: 1,
       source: 'now_playing',
+      searchResults: false,
       errors: [],
       movies: [],
       mainCharacters: [],
@@ -134,6 +146,7 @@ export default {
       movie: {},
       currentMovie: {},
       currentGenre: 1,
+      searchKeyword: '',
       tags: '',
       savedTags: [],
       genres: [],
@@ -172,6 +185,7 @@ export default {
     setSource (source) {
       this.currentPage = 1
       this.source = source
+      this.searchResults = false
       this.change()
     },
     details (movie) {
@@ -203,6 +217,7 @@ export default {
         })
     },
     filterByGenre (genre) {
+      this.searchResults = false
       axios.get(URL_API__DISCOVER_MOVIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
         '&include_video=false&page=' + this.currentPage + '&with_genres=' + genre.id)
         .then(response => {
@@ -217,6 +232,7 @@ export default {
         })
     },
     filterByTag (tag) {
+      this.searchResults = false
       axios.get(URL_LOCAL_API_MOVIE + '/tag/' + tag + '/page/' + this.currentPage)
         .then(response => {
           this.movies = response.data.movies
@@ -227,6 +243,7 @@ export default {
         })
     },
     filterBySavedGenre (idGenre) {
+      this.searchResults = false
       axios.get(URL_LOCAL_API_MOVIE + '/genre/' + idGenre + '/page/' + this.currentPage)
         .then(response => {
           this.movies = response.data.movies
@@ -249,8 +266,62 @@ export default {
         })
     },
     change () {
+      if (this.searchResults) {
+        if (this.source === 'my_movies') {
+          axios.get(URL_LOCAL_API_MOVIE + '/search/' + this.searchKeyword + '/page/' + this.currentPage)
+            .then(response => {
+              this.movies = response.data.movies
+              this.totalResults = response.data.total_results
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        } else {
+          axios.get(URL_API_SEARCH + 'movie?api_key=' + API_KEY + '&language=' + LNG + '&query=' + this.searchKeyword +
+            '&page=' + this.currentPage + '&include_adult=false')
+            .then(response => {
+              this.movies = response.data.results
+              this.totalResults = response.data.total_results
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        }
+      } else {
+        if (this.source === 'my_movies') {
+          axios.get(URL_LOCAL_API_MOVIE + '/page/' + this.currentPage)
+            .then(response => {
+              this.movies = response.data.movies
+              this.totalResults = response.data.total_results
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        } else if (this.source === 'genre') {
+          axios.get(URL_API__DISCOVER_MOVIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
+            '&include_video=false&page=' + this.currentPage + '&with_genres=' + this.currentGenre)
+            .then(response => {
+              this.movies = response.data.results
+              this.totalResults = response.data.total_results
+            }).catch(e => {
+              this.errors.push(e)
+            })
+        } else {
+          axios.get(URL_API_MOVIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
+            .then(response => {
+              this.movies = response.data.results
+              this.totalResults = response.data.total_results
+            }).catch(e => {
+              this.errors.push(e)
+            })
+        }
+      }
+    },
+    search () {
+      this.searchResults = true
+      this.currentPage = 1
       if (this.source === 'my_movies') {
-        axios.get(URL_LOCAL_API_MOVIE + '/page/' + this.currentPage)
+        axios.get(URL_LOCAL_API_MOVIE + '/search/' + this.searchKeyword + '/page/' + this.currentPage)
           .then(response => {
             this.movies = response.data.movies
             this.totalResults = response.data.total_results
@@ -258,21 +329,14 @@ export default {
           .catch(e => {
             this.errors.push(e)
           })
-      } else if (this.source === 'genre') {
-        axios.get(URL_API__DISCOVER_MOVIE + API_KEY + '&language=' + LNG + '&sort_by=popularity.desc&include_adult=false' +
-          '&include_video=false&page=' + this.currentPage + '&with_genres=' + this.currentGenre)
-          .then(response => {
-            this.movies = response.data.results
-            this.totalResults = response.data.total_results
-          }).catch(e => {
-            this.errors.push(e)
-          })
       } else {
-        axios.get(URL_API_MOVIE + this.source + '?api_key=' + API_KEY + '&language=' + LNG + '&page=' + this.currentPage)
+        axios.get(URL_API_SEARCH + 'movie?api_key=' + API_KEY + '&language=' + LNG + '&query=' + this.searchKeyword +
+          '&page=' + this.currentPage + '&include_adult=false')
           .then(response => {
             this.movies = response.data.results
             this.totalResults = response.data.total_results
-          }).catch(e => {
+          })
+          .catch(e => {
             this.errors.push(e)
           })
       }
@@ -360,7 +424,7 @@ export default {
   .filterList > li > a{
     font-size: 28px;
   }
-  .filmRow{
+  .filmRow, .searchForm{
     margin-bottom: 20px;
   }
   .cardMovie{
