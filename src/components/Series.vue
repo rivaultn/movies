@@ -86,9 +86,9 @@
               <b-link @click="filterByGenre(genre)" class="genreLink" v-for="genre in serie.genres" :key="genre.id"> {{genre.name}} </b-link>
             </b-col>
           </b-row>
-          <b-row class="mainCharacters">
+          <b-row class="mainCharacters" v-if="mainCharacters.length != 0">
             <b-card-group deck>
-              <b-card mx-auto class="cardCharacter" v-for="indexCharacter in 5" :key="indexCharacter" v-if="mainCharacters.length != 0"
+              <b-card mx-auto class="cardCharacter" v-for="indexCharacter in 5" :key="indexCharacter"
                       :title="mainCharacters[indexCharacter].name "
                       :img-src="mainCharacters[indexCharacter].profile_path ? path_img_face_138_175+mainCharacters[indexCharacter].profile_path  : require('../assets/No_Image_Available.jpg')"
                       img-alt="Img">
