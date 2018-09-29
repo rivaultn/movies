@@ -38,7 +38,7 @@ personnelle. Plus d'informations [ici](https://developers.themoviedb.org/3/getti
 
 ### 3. Modifier la clé d'authentification
 
-- Modifier la valeur de la constant 'PERSONAL_API_KEY' du fichier 'src/constant.js' par votre clé d'authentification
+- Modifier la valeur de la constant `PERSONAL_API_KEY` du fichier `src/constant.js` par votre clé d'authentification
 personnelle
 
 ### 3. Exécuter le projet
