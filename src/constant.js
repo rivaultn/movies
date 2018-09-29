@@ -1,5 +1,5 @@
 /** Personnal external API key */
-module.exports.PERSONAL_API_KEY = 'ae3e5728d96161eec2f5d86350cd1cdb'
+module.exports.PERSONAL_API_KEY = ''
 
 /** Language */
 module.exports.LNG = 'fr-FR'

@@ -7,7 +7,7 @@
 
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav class="componentFont">
-          <b-nav-item class="itemNav" @click="active($event)" href="../#/movie">FILMS</b-nav-item>
+          <b-nav-item class="itemNav active" @click="active($event)" href="../#/movie">FILMS</b-nav-item>
           <b-nav-item class="itemNav" @click="active($event)" href="../#/tv">SÉRIES</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
