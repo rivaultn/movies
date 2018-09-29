@@ -4,9 +4,9 @@ Une application pour gérer sa liste de films ou séries à regarder en y associ
 possibilité de filtrer par mot clé, genre, tag enregistré.
 Basée sur l'API [themoviedb](https://www.themoviedb.org/)
 
-<img src="./screen/screen1.png" height="24" width="48">
+<img src="./screen/screen1.png" height="350" width="700">
+<img src="./screen/screen2.png" height="350" width="700">
 
-![Screen2](./screen/screen2.png)
 ## Prérequis
 
 ### TheMovieDb
