@@ -13,8 +13,8 @@ app.use(bodyParser.urlencoded({'extended':'false'}));
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/movies', express.static(path.join(__dirname, 'dist')));
 app.use('/movie', movie);
-app.use('/series', express.static(path.join(__dirname, 'dist')));
-app.use('/serie', serie);
+app.use('/tv', express.static(path.join(__dirname, 'dist')));
+app.use('/tv', serie);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

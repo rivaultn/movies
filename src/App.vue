@@ -7,8 +7,8 @@
 
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav class="componentFont">
-          <b-nav-item href="#/movies">FILMS</b-nav-item>
-          <b-nav-item href="#/series"><b>SÉRIES</b></b-nav-item>
+          <b-nav-item class="itemNav" @click="active($event)" href="../#/movie">FILMS</b-nav-item>
+          <b-nav-item class="itemNav" @click="active($event)" href="../#/tv">SÉRIES</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -18,7 +18,21 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  methods: {
+    /**
+     * Manage the color of the navbar Film / Serie
+     * @param event the emitter event
+     */
+    active (event) {
+      var active = document.querySelector('.itemNav > a.active')
+
+      if (active !== null) {
+        active.classList.remove('active')
+      }
+      event.target.classList.add('active')
+    }
+  }
 }
 </script>
 

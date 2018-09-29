@@ -1,10 +1,15 @@
+/**
+ * Serie schema
+ * @type {*|Mongoose}
+ */
+
 var mongoose = require('mongoose')
 
 var SerieSchema = new mongoose.Schema({
   id: Number,
   comment: String,
   tags: [String],
-  name: String,
+  title: String,
   poster_path: String,
   genres: [Number]
 })
