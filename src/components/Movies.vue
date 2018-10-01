@@ -109,7 +109,6 @@ export default {
     }
   },
   created () {
-    console.log(c.COUCOU)
     if (this.itemSource === c.TV_KEYWORD) { this.source = c.NOW_PLAYING_TV }
 
     // get the films or series

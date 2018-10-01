@@ -1,7 +1,7 @@
 # MyMoviesApp
 
-Une application pour gérer sa liste de films ou séries à regarder en y associant des commentaires ou des "tags" avec
-possibilité de filtrer par mot clé, genre, tag enregistré.
+Une application responsive pour gérer sa liste de films ou séries à regarder en y associant des commentaires ou des 
+"tags" avec possibilité de filtrer par mot clé, genre, tag enregistré.
 Basée sur l'API [themoviedb](https://www.themoviedb.org/)
 
 <img src="./screen/screen1.png" height="350" width="700">
