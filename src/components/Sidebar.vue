@@ -1,20 +1,19 @@
 <!--  Component the represent the left sidebar  -->
 <template>
-  <b-col class="filterColumn" sm="1">
-    <ul class="filterTagList filterList" v-if="local === true">
-      <h3>TAGS</h3>
-      <li v-for="savedTag in savedTags" :key="savedTag">
-        <b-link @click="filterByTag(savedTag, $event)" class="filterLink">{{ savedTag}}</b-link>
-      </li>
-    </ul>
+    <b-col class="filterColumn" sm="1" >
+      <b-navbar class="filterNavbar" toggleable="md" type="dark">
+        <b-navbar-toggle target="nav_filter_collapse"></b-navbar-toggle>
 
-    <ul class="filterGenreList filterList">
-      <h3>GENRES</h3>
-      <li v-for="genre in genres" :key="genre.id">
-        <b-link @click="filterByGenre(genre, $event)" class="filterLink">{{ genre.name}}</b-link>
-      </li>
-    </ul>
-  </b-col>
+        <b-collapse is-nav id="nav_filter_collapse">
+          <b-nav vertical class="componentFont filterList">
+            <h3 v-if="local === true">TAGS</h3>
+            <b-nav-item v-if="local === true" v-for="savedTag in savedTags" :key="savedTag" @click="filterByTag(savedTag, $event)" class="filterLink">{{ savedTag}}</b-nav-item><br />
+            <h3>GENRES</h3>
+            <b-nav-item v-for="genre in genres" :key="genre.id" @click="filterByGenre(genre, $event)" class="filterLink">{{ genre.name}}</b-nav-item>
+          </b-nav>
+        </b-collapse>
+      </b-navbar>
+    </b-col>
 </template>
 
 <script>
@@ -66,8 +65,7 @@ export default {
       document.querySelector('#input-search').value = ''
 
       // remove active class on tags & genres & add active class on the active link
-      this.removeActiveClass('.filterTagList > li > a.active')
-      this.removeActiveClass('.filterGenreList > li > a.active')
+      this.removeActiveClass('.filterList a.active')
       event.target.classList.add('active')
 
       this.$emit('filterByGenre', genre)
@@ -80,8 +78,7 @@ export default {
       // reset input search
       document.querySelector('#input-search').value = ''
 
-      this.removeActiveClass('.filterTagList > li > a.active')
-      this.removeActiveClass('.filterGenreList > li > a.active')
+      this.removeActiveClass('.filterList a.active')
       event.target.classList.add('active')
 
       /** Get the results of the filter & alert the component parent */
@@ -125,5 +122,10 @@ export default {
   .filterLink:hover{
     color: #A2AFC1 !important;
     text-decoration: inherit;
+  }
+  @media (max-width: 768px) {
+    .filterList {
+      padding-left: 0px;
+    }
   }
 </style>

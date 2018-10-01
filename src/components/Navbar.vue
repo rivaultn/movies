@@ -1,7 +1,7 @@
 <!--  Component that represent the horizontal navbar  -->
 <template>
   <div>
-    <b-nav>
+    <b-nav class="sourceNavbar">
       <b-nav-item id='nowPlayingItem' @click="setSource(itemSource === c.TV_KEYWORD ? c.NOW_PLAYING_TV : c.NOW_PLAYING_MOVIE, $event)"
                   active class="nav-tab">EN SALLE</b-nav-item>
       <b-nav-item id='popularItem' @click="setSource('popular', $event)" class="nav-tab">POPULAIRE</b-nav-item>
@@ -60,19 +60,13 @@ export default {
      */
     resetActiveLink () {
       // reset active link in genres section in sidebar component
-      var active = document.querySelector('.filterGenreList > li > a.active')
-      if (active !== null) {
-        active.classList.remove('active')
-      }
-
-      // reset active link in tags section in sidebar component
-      active = document.querySelector('.filterTagList > li > a.active')
+      var active = document.querySelector('.filterList a.active')
       if (active !== null) {
         active.classList.remove('active')
       }
 
       // reset active link in navbar component
-      active = document.querySelector('.nav > li > a.active')
+      active = document.querySelector('.sourceNavbar a.active')
       if (active !== null) {
         active.classList.remove('active')
       }

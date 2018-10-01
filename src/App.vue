@@ -25,7 +25,7 @@ export default {
      * @param event the emitter event
      */
     active (event) {
-      var active = document.querySelector('.itemNav > a.active')
+      var active = document.querySelector('.itemNav a.active')
 
       if (active !== null) {
         active.classList.remove('active')

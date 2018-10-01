@@ -46,5 +46,10 @@ module.exports.PATH_IMG_200 = this.URL_PATH_IMG + 'w200/'
 module.exports.PATH_IMG_FACE_138_175 = this.URL_PATH_IMG + 'w138_and_h175_face'
 
 /** Maximum item per page */
-module.exports.MAX_PER_PAGE = 20
-module.exports.MAX_PER_ROW = 5
+if (global.matchMedia('(max-width: 768px)').matches) { // if it's a smartphone
+  module.exports.MAX_PER_PAGE = 10
+  module.exports.MAX_PER_ROW = 2
+} else {
+  module.exports.MAX_PER_PAGE = 20
+  module.exports.MAX_PER_ROW = 5
+}

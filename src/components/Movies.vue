@@ -30,7 +30,7 @@
         </b-row>
 
   <!--    pagination    -->
-        <b-row class="justify-content-md-center justify-content-sm-center paginationRow">
+        <b-row class="justify-content-center paginationRow">
           <b-pagination v-on:input="changeItems" :total-rows="totalResults" :per-page="20" v-model="currentPage" class="componentFont"/>
         </b-row>
 
@@ -109,6 +109,7 @@ export default {
     }
   },
   created () {
+    console.log(c.COUCOU)
     if (this.itemSource === c.TV_KEYWORD) { this.source = c.NOW_PLAYING_TV }
 
     // get the films or series
